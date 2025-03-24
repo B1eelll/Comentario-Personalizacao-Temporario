@@ -130,125 +130,125 @@ function adicionarClienteNoBackEnd(cliente) { // função que tem como objetivo 
   fetch(URL_API + "/clientes", { // método fetch, chama a const com o valor da api + "/clientes"
     method: "POST", // método post, objetivo de adicionar
     headers: { // cabeçario
-      "Content-Type": "application/json", // conteudo vai ser um arquivo
-      Authorization: obterToken(),
+      "Content-Type": "application/json", // conteudo vai ser um arquivo JSON
+      Authorization: obterToken(), // para a autenticação vai ser necessária o token
     },
-    body: JSON.stringify(cliente),
+    body: JSON.stringify(cliente), // corpo da requisição, vai ser um arquivo JSON
   })
-    .then((response) => response.json())
-    .then((response) => {
-      let novoCliente = new Cliente(response);
-      listaClientes.push(novoCliente);
-      popularTabela(listaClientes);
-      modalCliente.hide();
-
-      Swal.fire({
-        title: 'Cliente adicionado com sucesso!',
-        icon: 'success',
-        timer: 5000,
-        showConfirmButton: false
+    .then((response) => response.json()) // converte a resposta para JSON
+    .then((response) => { // respota da requisição: 
+      let novoCliente = new Cliente(response); // cria uma variavel responsavel para esse novo cliente adicionado
+      listaClientes.push(novoCliente); // faz um metodo push para adicionar o novo cliente na lista de clientes
+      popularTabela(listaClientes); // adiciona esse cliente na tabela
+      modalCliente.hide(); // esconde o modal
+ 
+      Swal.fire({ //  mensagem de alerta
+        title: 'Cliente adicionado com sucesso!', // titulo da mensagem
+        icon: 'success', // icone da mensagem, no caso um icone de sucesso
+        timer: 5000, // tempo que essa mensagem vai ficar na tela (5000 milisegundos, ou 5 segundos)
+        showConfirmButton: false //botão de fechar
       })
     });
 }
 
-function editarCliente(id) {
+function editarCliente(id) { // função de editar um cliente pelo id
   //Dizer que estou editando.
-  modoEdicao = true;
-  //trocar o texto lá do modal para editarCliente;
-  formModal.titulo.textContent = "Editar Cliente";
+  modoEdicao = true; // modo de edição ativado  
+
+  formModal.titulo.textContent = "Editar Cliente";  //trocar o texto lá do modal para editarCliente;
 
   //Preencher os campos do modal com os dados do cliente que estou editando.
-  let cliente = listaClientes.find((c) => c.id == id);
-  atualizarCamposModal(cliente);
+  let cliente = listaClientes.find((c) => c.id == id); // cria uma variavel com o nome de cliente e busca na lista de clientes o cliente que tem o id igual ao id passado
+  atualizarCamposModal(cliente); // função para atualizar os campos do modal
 
   //mostrar o modal
-  modalCliente.show();
+  modalCliente.show(); // função para mostrar o modal
 }
 
-function excluirCliente(id) {
-  let cliente = listaClientes.find((cliente) => cliente.id == id);
+function excluirCliente(id) { //  função de excluir um cliente
+  let cliente = listaClientes.find((cliente) => cliente.id == id); // cria uma variavel responsavel para o cliente que vai ser excluido
 
   // if (confirm("Deseja excluir o cliente " + cliente.nome + "?")) {
   //   excluirClienteNoBackEnd(id);
   // }
 
-  Swal.fire({
-    title: "Deseja excluir o cliente " + cliente.nome + "?",
-    showCancelButton: true,
-    confirmButtonText: "Sim",
-    cancelButtonText: "Não",
-    showLoaderOnConfirm: true,
-    icon: "info"     
-  }).then((result) => {
-    if (result.isConfirmed) {
-      excluirClienteNoBackEnd(id);
+  Swal.fire({ // mais uma mensagem de alerta 
+    title: "Deseja excluir o cliente " + cliente.nome + "?", //  titulo da mensagem com o conteúdo de "Deseja excluir o cliente xxxxxx ? "
+    showCancelButton: true, // botao de cancelar 
+    confirmButtonText: "Sim", // conteudo do botão de confirmaar
+    cancelButtonText: "Não", // conteudo do botão de cancelar 
+    showLoaderOnConfirm: true, // exibe um carregamento enquanto a requisição é feita
+    icon: "info"      // icone de informação
+  }).then((result) => { // resposta da mensagem de alerta
+    if (result.isConfirmed) { //  caso o usuario clique no botão de confirmar
+      excluirClienteNoBackEnd(id); // chama a função de excluir o id do cliente no backend
     }
   });
 }
 
-function excluirClienteNoBackEnd(id) {
-  fetch(URL_API + "/clientes/" + id, {
-    method: "DELETE",
-    headers: {
-      Authorization: obterToken(),
+function excluirClienteNoBackEnd(id) { //  conteudo da função de excluir o cliente do backend
+  fetch(URL_API + "/clientes/" + id, { // faz uma requisição para o backend para excluir o cliente
+    method: "DELETE", // metódo delete, responsavel por simplismente deletar o cliente do backend
+    headers: { // cabeçario da requisição
+      Authorization: obterToken(), // autorização da requisição é o token
     },
-  }).then(() => {
-    removerClienteDaLista(id);
-    popularTabela(listaClientes);
+  }).then(() => { // resposta da requisição
+    removerClienteDaLista(id); // função remover o id do cliente
+    popularTabela(listaClientes); // popular novamente a lista de clientes na teabela
 
-    Swal.fire({
-      title: 'Cliente excluido com sucesso!',
-      icon: 'success',
-      timer: 5000,
-      showConfirmButton: false
+    Swal.fire({ // mostrar uma mensagem de alerta 
+      title: 'Cliente excluido com sucesso!', // titulo da mensagem 
+      icon: 'success', // icone da mensagem
+      timer: 5000, //  tempo que a mensagem será exibida
+      showConfirmButton: false // botão de fechar
     })
   });
 }
 
-function removerClienteDaLista(id) {
-  let indice = listaClientes.findIndex((cliente) => cliente.id == id);
+function removerClienteDaLista(id) { //  função de remover o cliente da lista utilizando o id por parametro
+  let indice = listaClientes.findIndex((cliente) => cliente.id == id); // procura o indice do cliente que tem o id igual ao id passado
 
-  listaClientes.splice(indice, 1);
+  listaClientes.splice(indice, 1); // remove o cliente da lista
 }
 
-function atualizarCamposModal(cliente) {
-  formModal.id.value = cliente.id;
-  formModal.nome.value = cliente.nome;
-  formModal.email.value = cliente.email;
-  formModal.cpfOuCnpj.value = cliente.cpfOuCnpj;
-  formModal.telefone.value = cliente.telefone;
+function atualizarCamposModal(cliente) { //  função de atualizar o campo do modal na tabela clientes
+  formModal.id.value = cliente.id; //  informa o id 
+  formModal.nome.value = cliente.nome; //  informa o nome
+  formModal.email.value = cliente.email; //  informa o email 
+  formModal.cpfOuCnpj.value = cliente.cpfOuCnpj; //  informa o cpfOuCnpj
+  formModal.telefone.value = cliente.telefone; //  informa o telefone
   formModal.dataCadastro.value = cliente.dataCadastro.substring(0, 10); // Aqui pego só a data para passar ao campo do tipo date.
 }
 
 
-function atualizarClienteNoBackEnd(cliente){
-  fetch(URL_API + "/clientes/" + cliente.id, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: obterToken(),
+function atualizarClienteNoBackEnd(cliente){ // função de atualizar o cliente no backend
+  fetch(URL_API + "/clientes/" + cliente.id, { // requisição para o backend atualizar o cliente
+    method: "PUT", // método put (ADICIONAR)
+    headers: { // cabeçalho
+      "Content-Type": "application/json", // transforma em um arquivo JSON
+      Authorization: obterToken(), // autorização da requisição é o token
     },
-    body: JSON.stringify(cliente),
+    body: JSON.stringify(cliente), // Corpo da requisição é um arquivo JSON
   })
-    .then((response) => response.json())
-    .then((response) => {
+    .then((response) => response.json()) // resposta transforma o arquivo em JSON 
+    .then((response) => { // Resposta da requisição
      
-      atualizarClienteNaTabela(cliente);
-      modalCliente.hide();
+      atualizarClienteNaTabela(cliente); // função de atualizar o cliente na tabela
+      modalCliente.hide(); // esconde o modal
 
-      Swal.fire({
-        title: 'Cliente atualizado com sucesso!',
-        icon: 'success',
-        timer: 5000,
-        showConfirmButton: false
+      Swal.fire({ // mensagem de alerta
+        title: 'Cliente atualizado com sucesso!', // titulo da mensagem
+        icon: 'success', // icone da mensagem
+        timer: 5000, // tempo que a mensagem será exibida
+        showConfirmButton: false // botão de fechar
       });
 
     });
 }
 
-function atualizarClienteNaTabela(cliente){
-  let indice = listaClientes.findIndex((c) => c.id == cliente.id);
-  listaClientes[indice] = cliente;
+function atualizarClienteNaTabela(cliente){ // funlção de atualizar os clientes na tabela
+  let indice = listaClientes.findIndex((c) => c.id == cliente.id); // função de procurar o indice do cliente que tem o id igual ao id do cliente que foi atualizado
+  listaClientes[indice] = cliente; // array dos clientes
 
-  popularTabela(listaClientes);
+  popularTabela(listaClientes); // função popular a tabela recebe como parametro a lista de clientes
 }
