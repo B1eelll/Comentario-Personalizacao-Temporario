@@ -1,61 +1,63 @@
-let listaClientes = [];
-let tabelaCliente = document.querySelector("table>tbody");
-let btnAdicionar = document.querySelector("#btn-adicionar");
-let modalCliente = new bootstrap.Modal(
-  document.querySelector("#modal-cliente")
+let listaClientes = []; // array aonde vai ficar os clientes
+let tabelaCliente = document.querySelector("table>tbody"); // tabela que vai ser preenchida com os clientes
+let btnAdicionar = document.querySelector("#btn-adicionar"); // Chama o botão que vai adicionar os clientes
+let modalCliente = new bootstrap.Modal( // adiciona um novo conteúdo modal vindo da biblioteca do bootstrap
+  document.querySelector("#modal-cliente") // chama o modal que vai ser adicionado
 );
-let modoEdicao = false;
+let modoEdicao = false; // variavel que vai verificar se o cliente está em modo de edição ou não
 
-let formModal = {
-  titulo: document.querySelector("h4.modal-title"),
-  id: document.querySelector("#id"),
-  nome: document.querySelector("#nome"),
-  email: document.querySelector("#email"),
-  cpfOuCnpj: document.querySelector("#cpfOuCnpj"),
-  telefone: document.querySelector("#telefone"),
-  dataCadastro: document.querySelector("#dataCadastro"),
-  btnSalvar: document.querySelector("#btn-salvar"),
-  btnCancelar: document.querySelector("#btn-cancelar"),
+let formModal = { // array que vai armazenar os dados do cliente dentro do modal
+  titulo: document.querySelector("h4.modal-title"), // aqui chama o titulo
+  id: document.querySelector("#id"), // aqui o id
+  nome: document.querySelector("#nome"), // aquii o nome
+  email: document.querySelector("#email"), // email
+  cpfOuCnpj: document.querySelector("#cpfOuCnpj"), // cpf ou o cnpj do cliente
+  telefone: document.querySelector("#telefone"), // o telefone do cliente
+  dataCadastro: document.querySelector("#dataCadastro"), // a data que o cliente foi cadastrado 
+  btnSalvar: document.querySelector("#btn-salvar"), //  um botão de salvar os dados
+  btnCancelar: document.querySelector("#btn-cancelar"), // e um botão de cancelar as alterações
 };
 
-btnAdicionar.addEventListener("click", () => {
-  formModal.titulo.textContent = "Adicionar Cliente";
-  limparCamposModal();
-  modalCliente.show();
+btnAdicionar.addEventListener("click", () => { // o botão "btnAdicionar", recebe um evento de escuta, um click
+  formModal.titulo.textContent = "Adicionar Cliente"; //  ao receber a escuta o botão deverá mudar o texto para "Adicionar Cliente"
+  limparCamposModal(); // chama a função que limpa os campos do modal
+  modalCliente.show(); // chama a função que mostra os novos dados do modal
 });
 
-formModal.btnSalvar.addEventListener("click", () => {
-  let cliente = obterClienteDoModal();
+formModal.btnSalvar.addEventListener("click", () => { // o botão "btnSalvar", recebe um evento de escuta, um click
+  let cliente = obterClienteDoModal(); // a variavel cliente, recebe um função "obterClienteDoMOdal"
 
-  if (!cliente.validar()) {
-    Swal.fire({
-      title: 'Preencha todos os campos',
-      icon: 'warning',
-      confirmButtonText: 'OK',
+  if (!cliente.validar()) { // Se a validação do cliente não for váloda 
+    Swal.fire({ // chama uma mensagem de erro da biblioteca do bootstrap 
+      title: 'Preencha todos os campos', // o titulo da mensagem
+      icon: 'warning', // o icone, (no caso é um icone de alerta)
+      confirmButtonText: 'OK', // o texto do botão de confirmar
     })
-    return;
+    return; // retorna a função
   }
 
   // Verificar se estou em modo edição, pois se tiver, eu atualizo, se não eu cadastro
 
 
-(modoEdicao) ? atualizarClienteNoBackEnd(cliente) : adicionarClienteNoBackEnd(cliente);
+(modoEdicao) ? atualizarClienteNoBackEnd(cliente) : adicionarClienteNoBackEnd(cliente); /* isso é uma estrutura
+condicional binária. onde verifica a condição "modo de edição", após o "?" é a condição verdadeira
+após o ":" é caso a condição seja falsa */
 
 });
 
-function limparCamposModal() {
-  formModal.id.value = "";
-  formModal.nome.value = "";
-  formModal.email.value = "";
-  formModal.cpfOuCnpj.value = "";
-  formModal.telefone.value = "";
-  formModal.dataCadastro.value = "";
+function limparCamposModal() { // uma simples função que limpa os campos do modal
+  formModal.id.value = ""; // tira o valor do campo id
+  formModal.nome.value = ""; // tira o valor do campo nome
+  formModal.email.value = ""; // tira o valor do campo enmail
+  formModal.cpfOuCnpj.value = "";// tira o valor do campo cpfOuCnpj
+  formModal.telefone.value = "";// tira o valor do campo telefone
+  formModal.dataCadastro.value = "";// tira o valor do campo dataCadastro
 }
-function obterClientes() {
-  fetch(URL_API + "/clientes", {
-    method: "GET",
-    headers: {
-      authorization: obterToken(),
+function obterClientes() { // aqui uma função que chama na api a tabela clientes
+  fetch(URL_API + "/clientes", { //método fetch, recebe a const da url + "/clientes"
+    method: "GET", //diz o método. Get = Recupera os dados no servidor
+    headers: { //cabeçalho da requisição
+      authorization: obterToken(), // para que a requisição seja feita, é necessaria autenticação com token
     },
   }) // Faz a requisição para a URL da API
     .then((response) => response.json()) // Converte a resposta para JSON
@@ -96,8 +98,8 @@ function popularTabela(clientes) {
     ).toLocaleDateString(); // Atribui o valor da data de cadastro do cliente
 
     acoes.innerHTML = `
-                        <button onclick="editarCliente(${cliente.id})" class="btn btn-outline-primary btn-sm mr-3">Editar</button>
-                        <button onclick="excluirCliente(${cliente.id})" class="btn btn-outline-danger btn-sm mr-3">Excluir</button>`; // Cria um botão de excluir
+                        <button onclick="editarCliente(${cliente.id})" class="btn btn-outline-primary btn-sm mr-3">Editar</button> 
+                        <button onclick="excluirCliente(${cliente.id})" class="btn btn-outline-danger btn-sm mr-3">Excluir</button>`; // Cria um botão de excluir e de editar 
 
     linha.appendChild(id); // Adiciona a célula de ID na linha
     linha.appendChild(nome); // Adiciona a célula de nome na linha
@@ -111,24 +113,24 @@ function popularTabela(clientes) {
   });
 }
 
-function obterClienteDoModal() {
-  return new Cliente({
-    id: formModal.id.value,
-    nome: formModal.nome.value,
-    email: formModal.email.value,
-    cpfOuCnpj: formModal.cpfOuCnpj.value,
-    telefone: formModal.telefone.value,
-    dataCadastro: formModal.dataCadastro.value
-      ? new Date(formModal.dataCadastro.value).toISOString()
-      : new Date().toISOString(),
+function obterClienteDoModal() { // função que tem como objetivo obter os dados dos clientes do modal
+  return new Cliente({ // retorna um novo objeto do tipo Cliente
+    id: formModal.id.value, // valor do campo id do modal
+    nome: formModal.nome.value, // valor do campo nome do modal
+    email: formModal.email.value, // valor do campo email do modal
+    cpfOuCnpj: formModal.cpfOuCnpj.value, // valor do campo CPF do modal
+    telefone: formModal.telefone.value, // valor do campo telefone do modal
+    dataCadastro: formModal.dataCadastro.value // valor do campo da data de cadastro do modal
+      ? new Date(formModal.dataCadastro.value).toISOString() // converte a data de cadastro para JSON caso, verdadeiro
+      : new Date().toISOString(), // caso não tenha valor, atribui a data atual
   });
 }
 
-function adicionarClienteNoBackEnd(cliente) {
-  fetch(URL_API + "/clientes", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
+function adicionarClienteNoBackEnd(cliente) { // função que tem como objetivo ADICIONAR um novo cliente no back-end
+  fetch(URL_API + "/clientes", { // método fetch, chama a const com o valor da api + "/clientes"
+    method: "POST", // método post, objetivo de adicionar
+    headers: { // cabeçario
+      "Content-Type": "application/json", // conteudo vai ser um arquivo
       Authorization: obterToken(),
     },
     body: JSON.stringify(cliente),
